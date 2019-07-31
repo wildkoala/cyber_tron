@@ -1,0 +1,97 @@
+TRON Protocol
+
+
+//EVERYTHING BELOW THIS LINE IS WHAT THE SERVER WILL SEND OUT. MUST BE PARSED BY THE CLIENTS TO INIT GAME.
+
+CYBER TRON
+
+### INITIALIZING BOARD ###
+
+board_dimensions = 8
+block_width = 50
+player1 = ['192.168.0.2', 'red', (0,0), "s"]
+player2 = ['192.168.0.3', 'blue', (100,100), "w"]
+
+
+### PLAYER MOVE ###
+player1, 'd'
+
+### PLAYER MOVE ###
+player2, 'a'
+
+
+
+// END OF EXAMPLE USAGE OF PROTOCOL
+
+// GENERAL INFO
+
+server:
+	- Have an opening screen w/ number of clients connected.
+	- Accepts 2 to begin with... then generate a new game for every new 2. Will scale/change in the future to accept more.
+
+	- Have a win loss screen
+	- Track what order people lost in
+	- Process collisions. (Player-Player, Player-Line)
+
+	PROTOCOL NEEDED:
+	- send out the board, including the blocks that have already been traveled on
+		- Are they going to leave a colored line?
+		- or is it a binary thing? Traveled/Not Traveled
+		- die if you hit your own line?
+	- send out the positions of the players
+		- x,y coordinate.
+
+	***NOTE***
+	While it will create put a greater computational load on the clients, it would reduce the amount of traffic that would move over the net
+	if the protocol required that each client maintain their own board and make changes as they are pushed out by the server. Everyone's will be the same, but processed by the client.
+
+	
+GAME OBJECTS:
+
+			Player {
+				player_color : char (initially null, provided by server) 
+				is_alive : boolean
+				Current location: int from 0 - (n-1) **where n = size of board in blocks
+				Current direction: char ("w", "a", "s", "d")
+				Board {
+					num_of_players: 2 (int, hard code for now)
+					size: 1000 (int, and game area is a square, will be a func of the num of players)
+					state: [[row1],[row2],[row3],[row4],[row5],[row6],[row7],[row8],[row9],[row10],[row11],[row12],[row13], ... ] **  each row has (dimension) number of blocks in it
+				}
+			}
+
+			Block { 
+				size : int (# of pixels. Will be a function of the size of the board. For now its 50)
+				occupied: boolean (if someone is there right now.)
+				who_occupied: int (leave the player's number behind where they travel so we know who drove there.)
+				color : char (initially "w", then changes to )
+			} //this class is the hardest part, which data do we actually want to store in here?
+
+		
+
+	PROTOCOL:
+
+	Once at least 2 clients connect to the server, a READY? button will appear. 
+	Once they agree to the ready check, there will be a three second countdown and then the game will begin, with players on opposite sides of the board.
+	The server will initialize the board, creating the dimensions, designating colors to players, placing players in the game and marking the box they're in with a darker shade of their color. In the future, we can make these sprites.
+		- The board will also initialize a starting direction for the players based on their location, so that the players do not sit in place at the start of the game.
+	Once the player has these states, they draw their boards. 
+	Game begins and players move in a direction, moving 2 blocks/s. when they press a key, it's sent to the server, who pushes the player color and direction change to everyone else 
+	When a player runs into a wall, another player, or a line, then the server stops accepting input from that player, but continues to publish the rest of the changes so that the player can spectate the rest of the game.
+
+
+
+
+
+client:
+
+
+
+inital_board = [[Block,Block,Block,Block,Block,Block,Block,Block],
+				[Block,Block,Block,Block,Block,Block,Block,Block],
+				[Block,Block,Block,Block,Block,Block,Block,Block],
+				[Block,Block,Block,Block,Block,Block,Block,Block],
+				[Block,Block,Block,Block,Block,Block,Block,Block],
+				[Block,Block,Block,Block,Block,Block,Block,Block],
+				[Block,Block,Block,Block,Block,Block,Block,Block],
+				[Block,Block,Block,Block,Block,Block,Block,Block]]
